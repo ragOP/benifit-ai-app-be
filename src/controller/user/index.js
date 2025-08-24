@@ -54,7 +54,9 @@ exports.handleSingleRecord = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, data, "user records successfully"));
 });
+
 exports.handleAllRecords = asyncHandler(async (req, res) => {
   const data = await Response.find({});
   return res.status(200).json(new ApiResponse(200, data, "All records found"));
 });
+

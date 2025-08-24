@@ -51,6 +51,7 @@ exports.loginUser = async (username, password) => {
     };
   }
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+  
   const data = await User.findById(user._id).select("-password");
   return {
     statusCode: 200,

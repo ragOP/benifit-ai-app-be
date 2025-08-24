@@ -28,5 +28,5 @@ exports.handleLogin = asyncHandler(async (req, res) => {
 
   return res
     .status(statusCode)
-    .json(new ApiResponse(statusCode, data, message));
+    .json(new ApiResponse(statusCode, { data, token }, message));
 });

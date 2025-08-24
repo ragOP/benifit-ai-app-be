@@ -24,7 +24,7 @@ exports.handleLogin = asyncHandler(async (req, res) => {
     throw new ApiResponse(400, "", "username or password is invalid");
   }
   const result = await loginUser(username, password);
-  const { statusCode, data, message } = result;
+  const { statusCode, data, token, message } = result;
 
   return res
     .status(statusCode)

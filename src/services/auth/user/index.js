@@ -4,6 +4,7 @@ const {
   createUser,
 } = require("../../../repositories/auth/user/index.js");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 exports.registerUser = async (username, password) => {
   const checkExistingUser = await existingUser(username);
@@ -49,10 +50,12 @@ exports.loginUser = async (username, password) => {
       data: null,
     };
   }
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
   const data = await User.findById(user._id).select("-password");
   return {
     statusCode: 200,
     message: "login successful",
+    token: token,
     data: data,
   };
-}
+};

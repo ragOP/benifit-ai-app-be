@@ -7,7 +7,7 @@ const {
 
 const Router = express.Router();
 
-Router.route("/Register").post(handleRegister);
-Router.route("/Login").post(handleLogin);
+Router.route("/register").post(handleRegister);
+Router.route("/login").post(handleLogin);
 
 module.exports = Router;

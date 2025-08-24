@@ -8,7 +8,7 @@ const {
 const Router = express.Router();
 
 Router.route("/response").post(handleResponse);
-Router.route("/showSingleRecord").get(handleSingleRecord);
-Router.route("/showAllRecords").post(handleAllRecords);
+Router.route("/show-single-record").get(handleSingleRecord);
+Router.route("/show-all-records").post(handleAllRecords);
 
 module.exports = Router;

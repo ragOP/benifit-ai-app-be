@@ -25,7 +25,12 @@ exports.registerUser = async (username, password) => {
       data: null,
     };
   }
-  const data = await User.findById(newUser._id).select("-password");
+
+  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+
+  let data = await User.findById(newUser._id).select("-password");
+
+  data = { ...data._doc, token };
   return {
     statusCode: 201,
     message: "user created successfully",

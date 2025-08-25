@@ -51,12 +51,13 @@ exports.loginUser = async (username, password) => {
     };
   }
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-  
-  const data = await User.findById(user._id).select("-password");
+
+  let data = await User.findById(user._id).select("-password");
+
+  data = { ...data._doc, token };
   return {
     statusCode: 200,
     message: "login successful",
-    token: token,
     data: data,
   };
 };

@@ -43,7 +43,7 @@ exports.handleResponse = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, response, "User data saved successfully"));
 });
 
-exports.handleSingleRecord = asyncHandler(async (req, res) => {
+exports.handleQualifiedUser = asyncHandler(async (req, res) => {
   const userId = req.query.userId;
   if (!userId) {
     throw new ApiResponse(404, "", "enter a valid user id");
@@ -59,4 +59,3 @@ exports.handleAllRecords = asyncHandler(async (req, res) => {
   const data = await Response.find({});
   return res.status(200).json(new ApiResponse(200, data, "All records found"));
 });
-

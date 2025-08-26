@@ -7,6 +7,7 @@ const {
   claimOffer,
   abondendOffer,
 } = require("../../services/offer/index.js");
+const User = require("../../models/user/index.js");
 
 const TAGS = {
   is_md: "Medicare",
@@ -47,6 +48,7 @@ exports.handleResponse = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, response, "User data saved successfully"));
 });
+
 
 exports.handleQualifiedUser = asyncHandler(async (req, res) => {
   const userId = req.query.userId;
@@ -99,3 +101,37 @@ exports.handleAbandonedClaim = asyncHandler(async (req, res) => {
     )
   );
 });
+
+exports.handleGetAllUsers = asyncHandler(async (req, res) => {
+  let { search, page = 1, limit = 50 } = req.query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  const query = {};
+  if (search) {
+    query.$or = [
+      { username: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [data, total] = await Promise.all([
+    User.find(query).skip(skip).limit(limit),
+    User.countDocuments(query)
+  ]);
+
+  return res.status(200).json(
+    new ApiResponse(200, {
+      users: data,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page * limit < total,
+      hasPrevPage: page > 1
+    }, "All users found")
+  );
+});
+

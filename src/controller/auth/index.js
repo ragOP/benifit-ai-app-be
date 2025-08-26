@@ -7,11 +7,11 @@ const {
 } = require("../../services/auth/user/index.js");
 
 exports.handleRegister = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, fcmToken } = req.body;
   if (!username || !password) {
     throw new ApiResponse(400, "", "username or password is invalid");
   }
-  const result = await registerUser(username, password);
+  const result = await registerUser(username, password, fcmToken);
   const { statusCode, data, message } = result;
 
   return res
@@ -33,11 +33,11 @@ exports.handleLogin = asyncHandler(async (req, res) => {
 });
 
 exports.handleGoogleLogin = asyncHandler(async (req, res) => {
-  const { idToken } = req.body;
+  const { idToken, fcmToken } = req.body;
   if (!idToken) {
     throw new ApiResponse(400, "", "ID Token is required");
   }
-  const result = await loginWithGoogle(idToken);
+  const result = await loginWithGoogle(idToken, fcmToken);
   const { statusCode, data, message } = result;
 
   return res

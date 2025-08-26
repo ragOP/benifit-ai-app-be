@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const admin = require("../../../firebase/index.js");
 
-exports.registerUser = async (username, password) => {
+exports.registerUser = async (username, password, fcmToken) => {
   const checkExistingUser = await existingUser(username);
   if (checkExistingUser) {
     return {
@@ -18,7 +18,7 @@ exports.registerUser = async (username, password) => {
   }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  const newUser = await createUser(username, hashedPassword);
+  const newUser = await createUser(username, hashedPassword, fcmToken);
   if (!newUser) {
     return {
       statusCode: 500,
@@ -67,14 +67,13 @@ exports.loginUser = async (username, password) => {
     data: data,
   };
 };
-exports.loginWithGoogle = async (idToken) => {
+exports.loginWithGoogle = async (idToken, fcmToken) => {
   const decodedToken = await admin.auth().getUser(idToken);
-  console.log("Decoded Google ID Token:", decodedToken);
   const { email } = decodedToken;
 
   let user = await User.findOne({ email });
   if (!user) {
-    user = await User.create({ email });
+    user = await User.create({ email, fcmToken });
   }
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);

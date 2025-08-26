@@ -5,6 +5,7 @@ const {
 } = require("../../../repositories/auth/user/index.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const admin = require("../../../utils/firbase/index.js");
 
 exports.registerUser = async (username, password) => {
   const checkExistingUser = await existingUser(username);
@@ -59,6 +60,26 @@ exports.loginUser = async (username, password) => {
 
   let data = await User.findById(user._id).select("-password");
 
+  data = { ...data._doc, token };
+  return {
+    statusCode: 200,
+    message: "login successful",
+    data: data,
+  };
+};
+exports.loginWithGoogle = async (idToken) => {
+  const decodedToken = await admin.auth().getUser(idToken);
+  console.log("Decoded Google ID Token:", decodedToken);
+  const { email } = decodedToken;
+
+  let user = await User.findOne({ email });
+  if (!user) {
+    user = await User.create({ email });
+  }
+
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+  let data = await User.findById(user._id);
   data = { ...data._doc, token };
   return {
     statusCode: 200,

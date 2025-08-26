@@ -2,6 +2,11 @@ const { ApiResponse } = require("../../utils/apiResponse/index.js");
 const { ApiError } = require("../../utils/apiError/index.js");
 const { asyncHandler } = require("../../utils/asynchandler/index.js");
 const Response = require("../../models/Response/index.js");
+const {
+  storeEligibleOffers,
+  claimOffer,
+  abondendOffer,
+} = require("../../services/offer/index.js");
 
 const TAGS = {
   is_md: "Medicare",
@@ -58,4 +63,39 @@ exports.handleQualifiedUser = asyncHandler(async (req, res) => {
 exports.handleAllRecords = asyncHandler(async (req, res) => {
   const data = await Response.find({});
   return res.status(200).json(new ApiResponse(200, data, "All records found"));
+});
+
+exports.handleAbandonedClaim = asyncHandler(async (req, res) => {
+  const { claimedOfferIds, userId } = req.body;
+  if (!userId) {
+    throw new ApiResponse(404, "enter a valid user id");
+  }
+  const eligibleOffers = await storeEligibleOffers(userId);
+  if (!eligibleOffers.status) {
+    return res
+      .statu(200)
+      .json(
+        new ApiResponse(
+          eligibleOffers.statusCode,
+          eligibleOffers.data,
+          eligibleOffers.message
+        )
+      );
+  }
+  const claimedOfferData = await claimOffer(userId, claimedOfferIds);
+  const abondendOfferData = await abondendOffer(userId);
+
+  ///
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        // eligibleOffers,
+        claimedOfferData,
+        abondendOfferData,
+      },
+      "Data fetched successfully"
+    )
+  );
 });

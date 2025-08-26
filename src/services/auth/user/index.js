@@ -74,15 +74,13 @@ exports.loginWithGoogle = async (idToken, fcmToken) => {
   const decodedToken = await admin.auth().getUser(idToken);
   const { email } = decodedToken;
   let user = await User.findOne({ email });
-  fcmToken = fcmToken || user.fcmToken;
-  user.fcmToken = fcmToken;
-  await user.save();
   if (!user) {
     user = await User.create({ email, fcmToken });
   }
-
+  fcmToken = fcmToken || user.fcmToken;
+  user.fcmToken = fcmToken;
+  await user.save();
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-
   let data = await User.findById(user._id);
   data = { ...data._doc, token };
   return {

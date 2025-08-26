@@ -5,7 +5,7 @@ const {
 } = require("../../../repositories/auth/user/index.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const admin = require("../../../utils/firbase/index.js");
+const admin = require("../../../firebase/index.js");
 
 exports.registerUser = async (username, password) => {
   const checkExistingUser = await existingUser(username);

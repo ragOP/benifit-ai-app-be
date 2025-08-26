@@ -20,11 +20,11 @@ exports.handleRegister = asyncHandler(async (req, res) => {
 });
 
 exports.handleLogin = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, fcmToken } = req.body;
   if (!username || !password) {
     throw new ApiResponse(400, "", "username or password is invalid");
   }
-  const result = await loginUser(username, password);
+  const result = await loginUser(username, password, fcmToken);
   const { statusCode, data, message } = result;
 
   return res

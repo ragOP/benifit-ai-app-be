@@ -39,7 +39,7 @@ exports.registerUser = async (username, password, fcmToken) => {
   };
 };
 
-exports.loginUser = async (username, password) => {
+exports.loginUser = async (username, password, fcmToken) => {
   const user = await existingUser(username);
   if (!user) {
     return {
@@ -48,6 +48,9 @@ exports.loginUser = async (username, password) => {
       data: null,
     };
   }
+  fcmToken = fcmToken || user.fcmToken;
+  user.fcmToken = fcmToken;
+  await user.save();
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
     return {
@@ -70,8 +73,10 @@ exports.loginUser = async (username, password) => {
 exports.loginWithGoogle = async (idToken, fcmToken) => {
   const decodedToken = await admin.auth().getUser(idToken);
   const { email } = decodedToken;
-
   let user = await User.findOne({ email });
+  fcmToken = fcmToken || user.fcmToken;
+  user.fcmToken = fcmToken;
+  await user.save();
   if (!user) {
     user = await User.create({ email, fcmToken });
   }

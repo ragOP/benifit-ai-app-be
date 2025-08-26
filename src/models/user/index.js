@@ -4,12 +4,18 @@ const userSchema = new Schema({
   username: {
     type: String,
     lowercase: true,
-    required: true,
+    // required: true,
     unique: true,
   },
   password: {
     type: String,
-    required: true,
+    // required: true,
+  },
+  email: {
+    type: String,
+    lowercase: true,
+    // required: true,
+    unique: true,
   },
   fcmToken: {
     type: String,

@@ -31,6 +31,12 @@ const responseSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    claimedOffer: {
+      type: [String],
+    },
+    unClaimedOffer: {
+      type: [String],
+    },
     sendMessageOn: {
       type: String,
       default: "",

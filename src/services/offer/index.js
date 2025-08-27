@@ -55,6 +55,12 @@ exports.claimOffer = async (userId, offerIds) => {
       message: "no claimed offer",
     };
   }
+  // const claim = await Response.findByIdAndUpdate(
+  //   userId,
+  //   {
+  //     claimedOffer: {$in: claimedOffers}
+  //   }
+  // )
   return {
     status: true,
     data: claimedOffers,
@@ -80,6 +86,27 @@ exports.abondendOffer = async (userId) => {
     status: true,
     data: abondendOffer,
     sucessCode: 200,
-    message: "",
+    message: "abondend data ",
   };
+};
+exports.storeClaimedOffer = async (claimedOfferIds, userId) => {
+  const claimedData = await Response.findOneAndUpdate(
+    { userId: userId }, // query
+    { $addToSet: { claimedOffer: claimedOfferIds } }, // update
+    { new: true }
+  );
+  // console.log("claimed Offers", claimedData);
+};
+exports.storeUnclaimedOffer = async (userId) => {
+  const abondendOffer = await Offer.find({
+    user: userId,
+    status: "abandoned",
+  });
+  const offerIds = abondendOffer.map((item) => item.offerId);
+  const unClaimedData = await Response.findOneAndUpdate(
+    { userId: userId },
+    { $addToSet: { unClaimedOffer: offerIds } },
+    { new: true }
+  );
+  console.log("un claimed Offers", unClaimedData);
 };

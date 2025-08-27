@@ -74,6 +74,7 @@ exports.handleAbandonedClaim = asyncHandler(async (req, res) => {
   if (!userId) {
     throw new ApiResponse(404, "enter a valid user id");
   }
+  console.log(userId);
   const eligibleOffers = await storeEligibleOffers(userId);
   if (!eligibleOffers.status) {
     return res

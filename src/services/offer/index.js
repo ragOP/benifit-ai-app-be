@@ -11,6 +11,7 @@ exports.storeEligibleOffers = async (userId) => {
       message: "User not found",
     };
   }
+  console.log(userId);
 
   const createdOffers = [];
   const userIdValue = response.userId || undefined;
@@ -90,7 +91,11 @@ exports.storeClaimedOffer = async (userId) => {
 
   const updatedResponse = await Response.findOneAndUpdate(
     { userId: userId },
-    { $addToSet: { claimedOffer: { $each: claimedOfferIds } } },
+    {
+      $addToSet: { claimedOffer: { $each: claimedOfferIds } },
+      $pull: { unClaimedOffer: { $in: claimedOfferIds } },
+    },
+
     { new: true }
   );
 

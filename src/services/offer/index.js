@@ -113,7 +113,10 @@ exports.storeUnclaimedOffer = async (userId) => {
   return updatedResponse;
 };
 exports.getClaimedOffer = async (userId) => {
-  const data = await Response.findOne({ userId }, { claimedOffer: 1, _id: 0 });
+  const data = await Response.findOne(
+    { userId },
+    { claimedOffer: 1, unClaimedOffer: 1, _id: 0 }
+  );
   if (!data) {
     return {
       status: 404,

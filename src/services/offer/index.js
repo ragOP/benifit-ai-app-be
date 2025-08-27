@@ -55,12 +55,6 @@ exports.claimOffer = async (userId, offerIds) => {
       message: "no claimed offer",
     };
   }
-  // const claim = await Response.findByIdAndUpdate(
-  //   userId,
-  //   {
-  //     claimedOffer: {$in: claimedOffers}
-  //   }
-  // )
   return {
     status: true,
     data: claimedOffers,
@@ -89,24 +83,47 @@ exports.abondendOffer = async (userId) => {
     message: "abondend data ",
   };
 };
-exports.storeClaimedOffer = async (claimedOfferIds, userId) => {
-  const claimedData = await Response.findOneAndUpdate(
-    { userId: userId }, // query
-    { $addToSet: { claimedOffer: claimedOfferIds } }, // update
+exports.storeClaimedOffer = async (userId) => {
+  const claimedOffers = await Offer.find({ user: userId, status: "claimed" });
+
+  const claimedOfferIds = claimedOffers.map((item) => item.offerId);
+
+  const updatedResponse = await Response.findOneAndUpdate(
+    { userId: userId },
+    { $addToSet: { claimedOffer: { $each: claimedOfferIds } } },
     { new: true }
   );
-  // console.log("claimed Offers", claimedData);
+
+  return updatedResponse;
 };
 exports.storeUnclaimedOffer = async (userId) => {
-  const abondendOffer = await Offer.find({
+  const abandonedOffers = await Offer.find({
     user: userId,
     status: "abandoned",
   });
-  const offerIds = abondendOffer.map((item) => item.offerId);
-  const unClaimedData = await Response.findOneAndUpdate(
+
+  const offerIds = abandonedOffers.map((item) => item.offerId);
+
+  const updatedResponse = await Response.findOneAndUpdate(
     { userId: userId },
-    { $addToSet: { unClaimedOffer: offerIds } },
+    { $addToSet: { unClaimedOffer: { $each: offerIds } } },
     { new: true }
   );
-  console.log("un claimed Offers", unClaimedData);
+
+  return updatedResponse;
+};
+exports.getClaimedOffer = async (userId) => {
+  const data = await Response.findOne({ userId }, { claimedOffer: 1, _id: 0 });
+  if (!data) {
+    return {
+      status: 404,
+      data: null,
+      message: "user not found",
+    };
+  }
+  return {
+    status: 200,
+    data: data,
+    message: "claimed offer data fetched succssfully",
+  };
 };

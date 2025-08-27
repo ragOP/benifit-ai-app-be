@@ -6,6 +6,8 @@ const {
   storeEligibleOffers,
   claimOffer,
   abondendOffer,
+  storeClaimedOffer,
+  storeUnclaimedOffer,
 } = require("../../services/offer/index.js");
 const User = require("../../models/user/index.js");
 
@@ -49,7 +51,6 @@ exports.handleResponse = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, response, "User data saved successfully"));
 });
 
-
 exports.handleQualifiedUser = asyncHandler(async (req, res) => {
   const userId = req.query.userId;
   if (!userId) {
@@ -72,10 +73,12 @@ exports.handleAbandonedClaim = asyncHandler(async (req, res) => {
   if (!userId) {
     throw new ApiResponse(404, "enter a valid user id");
   }
+  const claim = await storeClaimedOffer(claimedOfferIds, userId);
+  const unClaimedData = await storeUnclaimedOffer(userId);
   const eligibleOffers = await storeEligibleOffers(userId);
   if (!eligibleOffers.status) {
     return res
-      .statu(200)
+      .status(200)
       .json(
         new ApiResponse(
           eligibleOffers.statusCode,
@@ -120,18 +123,21 @@ exports.handleGetAllUsers = asyncHandler(async (req, res) => {
 
   const [data, total] = await Promise.all([
     User.find(query).skip(skip).limit(limit),
-    User.countDocuments(query)
+    User.countDocuments(query),
   ]);
 
   return res.status(200).json(
-    new ApiResponse(200, {
-      users: data,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-      hasNextPage: page * limit < total,
-      hasPrevPage: page > 1
-    }, "All users found")
+    new ApiResponse(
+      200,
+      {
+        users: data,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page * limit < total,
+        hasPrevPage: page > 1,
+      },
+      "All users found"
+    )
   );
 });
-

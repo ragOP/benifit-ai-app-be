@@ -8,6 +8,7 @@ const {
   abondendOffer,
   storeClaimedOffer,
   storeUnclaimedOffer,
+  getClaimedOffer,
 } = require("../../services/offer/index.js");
 const User = require("../../models/user/index.js");
 
@@ -73,8 +74,6 @@ exports.handleAbandonedClaim = asyncHandler(async (req, res) => {
   if (!userId) {
     throw new ApiResponse(404, "enter a valid user id");
   }
-  const claim = await storeClaimedOffer(claimedOfferIds, userId);
-  const unClaimedData = await storeUnclaimedOffer(userId);
   const eligibleOffers = await storeEligibleOffers(userId);
   if (!eligibleOffers.status) {
     return res
@@ -87,22 +86,34 @@ exports.handleAbandonedClaim = asyncHandler(async (req, res) => {
         )
       );
   }
+
   const claimedOfferData = await claimOffer(userId, claimedOfferIds);
   const abondendOfferData = await abondendOffer(userId);
-
-  ///
+  const claim = await storeClaimedOffer(userId);
+  const unClaimedData = await storeUnclaimedOffer(userId);
 
   return res.status(200).json(
     new ApiResponse(
       200,
       {
-        // eligibleOffers,
         claimedOfferData,
         abondendOfferData,
       },
       "Data fetched successfully"
     )
   );
+});
+exports.handleClaimedOffers = asyncHandler(async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) {
+    throw new ApiResponse(404, "", "enter a valid user id");
+  }
+  const claimedData = await getClaimedOffer(userId);
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(claimedData.status, claimedData.data, claimedData.message)
+    );
 });
 
 exports.handleGetAllUsers = asyncHandler(async (req, res) => {

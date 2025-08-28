@@ -39,8 +39,10 @@ exports.registerUser = async (username, password, email, fcmToken) => {
   };
 };
 
-exports.loginUser = async (username, password, email, fcmToken) => {
-  const user = await existingUser(username, email);
+exports.loginUser = async (loginId, password, fcmToken) => {
+  const user = await User.findOne({
+    $or: [{ username: loginId }, { email: loginId }],
+  });
   if (!user) {
     return {
       statusCode: 404,

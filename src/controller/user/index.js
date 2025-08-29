@@ -41,6 +41,7 @@ exports.handleResponse = asyncHandler(async (req, res) => {
     zipCode,
     tags: tagsArray,
     origin,
+    unClaimedOffer: tagsArray,
     sendMessageOn,
     number,
   });

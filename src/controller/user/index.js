@@ -154,3 +154,13 @@ exports.handleGetAllUsers = asyncHandler(async (req, res) => {
     )
   );
 });
+
+exports.handleGetRefrel = asyncHandler(async (req, res) => {
+  const appLink = {
+    androidLink: "kdfhshjdfs",
+    ios: "mdklngskl",
+  };
+  return res
+    .status(200)
+    .json(new ApiResponse(200, appLink, "refrel Success full"));
+});

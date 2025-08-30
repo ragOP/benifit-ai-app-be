@@ -6,18 +6,6 @@ const Message = require("../../models/chat/message/index.js");
 const Conversation = require("../../models/chat/conversation/index.js");
 const User = require("../../models/user/index.js");
 
-exports.handleCreateChat = asyncHandler(async (req, res) => {
-  const { userId, adminId } = req.body;
-  if (!userId) {
-    new ApiResponse(400, null, "Enter User Id");
-  }
-
-  const result = await createConversation(userId, adminId);
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, result.data, result.message));
-});
 exports.handleMessages = asyncHandler(async (req, res) => {
   const { text, userId, conversationId, adminId } = req.body;
   if (!text || !userId) {
@@ -27,8 +15,8 @@ exports.handleMessages = asyncHandler(async (req, res) => {
   }
   let conversation = conversationId;
   if (!conversationId) {
-    newConv = await createConversation(userId, adminId);
-    conversation = newConv._id;
+    let newConv = await createConversation(userId, adminId);
+    conversation = newConv.data._id;
   }
   const user = await User.findById(userId).select("role");
   if (!user) {
@@ -38,7 +26,7 @@ exports.handleMessages = asyncHandler(async (req, res) => {
   const result = await Message.create({
     text,
     userId,
-    conversation,
+    conversationId: conversation,
     role: user.role,
   });
   return res
@@ -49,18 +37,28 @@ exports.handleMessages = asyncHandler(async (req, res) => {
 });
 
 exports.handleGetChatHistory = asyncHandler(async (req, res) => {
-  const { conversationId } = req.params;
-  const conversation = await Conversation.findOne({ conversationId });
-  if (!conversation) {
-    new ApiResponse(400, null, "ConversationId Missing");
+  const { conversationId } = req.query;
+
+  if (!conversationId) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Conversation ID is required"));
   }
-  const message = await Message.find({ chatId: conversationId }).sort({
-    createdAt: 1,
-  });
+
+  const conversationExists = await Conversation.findById(conversationId);
+  if (!conversationExists) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "Conversation not found"));
+  }
+
+  const messages = await Message.find({ conversationId: conversationId })
+    .sort({ createdAt: 1 }) 
+    .populate("userId", "username email role"); 
 
   return res
     .status(200)
-    .json(new ApiResponse(200, message, "message fetched successfully"));
+    .json(new ApiResponse(200, messages, "Messages fetched successfully"));
 });
 exports.handleGetAllUser = asyncHandler(async (req, res) => {
   const result = await Conversation.find().populate(

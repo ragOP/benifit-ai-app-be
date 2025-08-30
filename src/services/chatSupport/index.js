@@ -4,8 +4,6 @@ exports.createConversation = async (userId, adminId) => {
   let conversation = await Conversation.findOne({
       participants: { $all: [userId, adminId] },
     });
-
-    // If not exists → create new
     if (!conversation) {
       conversation = await Conversation.create({
         participants: [userId, adminId],

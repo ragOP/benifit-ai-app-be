@@ -14,6 +14,9 @@ const messageSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    role: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const admin = require("../../../firebase/index.js");
 
-exports.registerUser = async (username, password, email, fcmToken) => {
+exports.registerUser = async (username, password, email, fcmToken, role) => {
   const checkExistingUser = await existingUser(username, email);
   if (checkExistingUser) {
     return {
@@ -18,7 +18,13 @@ exports.registerUser = async (username, password, email, fcmToken) => {
   }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  const newUser = await createUser(username, hashedPassword, email, fcmToken);
+  const newUser = await createUser(
+    username,
+    hashedPassword,
+    email,
+    fcmToken,
+    role
+  );
   if (!newUser) {
     return {
       statusCode: 500,

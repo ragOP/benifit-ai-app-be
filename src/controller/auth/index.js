@@ -7,7 +7,7 @@ const {
 } = require("../../services/auth/user/index.js");
 
 exports.handleRegister = asyncHandler(async (req, res) => {
-  const { username, password, email, fcmToken, role } = req.body;
+  const { username, password, email, fcmToken, role = "User" } = req.body;
   if (!username || !password) {
     throw new ApiResponse(400, "", "username or password is invalid");
   }

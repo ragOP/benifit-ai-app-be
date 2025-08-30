@@ -10,12 +10,19 @@ exports.existingUser = async (username, email) => {
   return null;
 };
 
-exports.createUser = async (username, hashedPassword, email, fcmToken) => {
+exports.createUser = async (
+  username,
+  hashedPassword,
+  email,
+  fcmToken,
+  role
+) => {
   const user = await User.create({
     username,
     password: hashedPassword,
     email,
-    fcmToken
+    fcmToken,
+    role,
   });
   return user;
 };

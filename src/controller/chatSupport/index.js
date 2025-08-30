@@ -37,7 +37,7 @@ exports.handleMessages = asyncHandler(async (req, res) => {
   // If no conversationId provided, create a new conversation
   if (!conversation) {
     const newConv = await createConversation(userId, adminId);
-    conversation = newConv.data._id; // store the new conversation ID
+    conversation = { _id: newConv.data._id }; // only store _id
   }
 
   // Fetch user and role
@@ -50,19 +50,17 @@ exports.handleMessages = asyncHandler(async (req, res) => {
   const result = await Message.create({
     text,
     userId,
-    conversationId: conversation,
+    conversationId: conversation._id,
     role: user.role,
   });
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        { result, conversation },
-        "Message created successfully"
-      )
-    );
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      { result }, // only send conversationId
+      "Message created successfully"
+    )
+  );
 });
 
 exports.handleGetChatHistory = asyncHandler(async (req, res) => {

@@ -14,8 +14,13 @@ const messageSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    role: {
+      type: String,
+      enum: ["User", "Admin"],
+      required: true,
+    },
   },
   { timestamps: true }
 );
-const Message = mongoose.model("messages", messageSchema);
+const Message = mongoose.model("Message", messageSchema);
 module.exports = Message;

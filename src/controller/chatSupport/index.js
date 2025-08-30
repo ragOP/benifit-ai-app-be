@@ -8,7 +8,8 @@ const User = require("../../models/user/index.js");
 const mongoose = require("mongoose");
 
 exports.handleMessages = asyncHandler(async (req, res) => {
-  const { text, userId, conversationId, adminId } = req.body;
+  const { text, userId, conversationId, adminId, role = "User" } = req.body;
+  console.log(role, ",,,,,");
 
   if (!text || !userId) {
     return res
@@ -40,18 +41,12 @@ exports.handleMessages = asyncHandler(async (req, res) => {
     conversation = { _id: newConv.data._id }; // only store _id
   }
 
-  // Fetch user and role
-  const user = await User.findById(userId).select("role");
-  if (!user) {
-    return res.status(404).json(new ApiResponse(404, null, "User not found"));
-  }
-
   // Create the message
   const result = await Message.create({
     text,
     userId,
     conversationId: conversation._id,
-    role: user.role,
+    role,
   });
 
   return res.status(200).json(

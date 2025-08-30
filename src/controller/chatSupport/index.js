@@ -4,6 +4,7 @@ const { asyncHandler } = require("../../utils/asynchandler/index.js");
 const { createConversation } = require("../../services/chatSupport/index.js");
 const Message = require("../../models/chat/message/index.js");
 const Conversation = require("../../models/chat/conversation/index.js");
+const User = require("../../models/user/index.js");
 
 exports.handleCreateChat = asyncHandler(async (req, res) => {
   const { userId, adminId } = req.body;
@@ -29,15 +30,22 @@ exports.handleMessages = asyncHandler(async (req, res) => {
     newConv = await createConversation(userId, adminId);
     conversation = newConv._id;
   }
+  const user = await User.findById(userId).select("role");
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, null, "User not found"));
+  }
 
   const result = await Message.create({
     text,
     userId,
     conversation,
+    role: user.role,
   });
   return res
     .status(200)
-    .json(new ApiResponse(200, result, "message created success"));
+    .json(
+      new ApiResponse(200, { result, conversation }, "message created success")
+    );
 });
 
 exports.handleGetChatHistory = asyncHandler(async (req, res) => {
@@ -57,7 +65,7 @@ exports.handleGetChatHistory = asyncHandler(async (req, res) => {
 exports.handleGetAllUser = asyncHandler(async (req, res) => {
   const result = await Conversation.find().populate(
     "participants",
-    "username email"
+    "username email role"
   );
   return res
     .status(200)

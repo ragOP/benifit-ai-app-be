@@ -5,34 +5,63 @@ const { createConversation } = require("../../services/chatSupport/index.js");
 const Message = require("../../models/chat/message/index.js");
 const Conversation = require("../../models/chat/conversation/index.js");
 const User = require("../../models/user/index.js");
+const mongoose = require("mongoose");
 
 exports.handleMessages = asyncHandler(async (req, res) => {
   const { text, userId, conversationId, adminId } = req.body;
+
   if (!text || !userId) {
     return res
       .status(400)
       .json(new ApiResponse(400, null, "Enter valid details"));
   }
-  let conversation = conversationId;
-  if (!conversationId) {
-    let newConv = await createConversation(userId, adminId);
-    conversation = newConv.data._id;
+
+  let conversation;
+
+  // If conversationId is provided, validate and use it
+  if (conversationId) {
+    if (mongoose.Types.ObjectId.isValid(conversationId)) {
+      conversation = await Conversation.findById(conversationId);
+      if (!conversation) {
+        return res
+          .status(404)
+          .json(new ApiResponse(404, null, "Conversation not found"));
+      }
+    } else {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Invalid conversationId"));
+    }
   }
+
+  // If no conversationId provided, create a new conversation
+  if (!conversation) {
+    const newConv = await createConversation(userId, adminId);
+    conversation = newConv.data._id; // store the new conversation ID
+  }
+
+  // Fetch user and role
   const user = await User.findById(userId).select("role");
   if (!user) {
     return res.status(404).json(new ApiResponse(404, null, "User not found"));
   }
 
+  // Create the message
   const result = await Message.create({
     text,
     userId,
     conversationId: conversation,
     role: user.role,
   });
+
   return res
     .status(200)
     .json(
-      new ApiResponse(200, { result, conversation }, "message created success")
+      new ApiResponse(
+        200,
+        { result, conversation },
+        "Message created successfully"
+      )
     );
 });
 
@@ -53,8 +82,8 @@ exports.handleGetChatHistory = asyncHandler(async (req, res) => {
   }
 
   const messages = await Message.find({ conversationId: conversationId })
-    .sort({ createdAt: 1 }) 
-    .populate("userId", "username email role"); 
+    .sort({ createdAt: 1 })
+    .populate("userId", "username email role");
 
   return res
     .status(200)
@@ -65,6 +94,7 @@ exports.handleGetAllUser = asyncHandler(async (req, res) => {
     "participants",
     "username email role"
   );
+  console.log("result", result);
   return res
     .status(200)
     .json(new ApiResponse(200, result, "all user fetched successfully"));

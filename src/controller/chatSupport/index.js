@@ -9,7 +9,6 @@ const mongoose = require("mongoose");
 
 exports.handleMessages = asyncHandler(async (req, res) => {
   const { text, userId, conversationId, adminId, role = "User" } = req.body;
-  console.log(role, ",,,,,");
 
   if (!text || !userId) {
     return res
@@ -19,7 +18,6 @@ exports.handleMessages = asyncHandler(async (req, res) => {
 
   let conversation;
 
-  // If conversationId is provided, validate and use it
   if (conversationId) {
     if (mongoose.Types.ObjectId.isValid(conversationId)) {
       conversation = await Conversation.findById(conversationId);
@@ -35,13 +33,11 @@ exports.handleMessages = asyncHandler(async (req, res) => {
     }
   }
 
-  // If no conversationId provided, create a new conversation
   if (!conversation) {
     const newConv = await createConversation(userId, adminId);
-    conversation = { _id: newConv.data._id }; // only store _id
+    conversation = { _id: newConv.data._id };
   }
 
-  // Create the message
   const result = await Message.create({
     text,
     userId,
@@ -52,7 +48,7 @@ exports.handleMessages = asyncHandler(async (req, res) => {
   return res.status(200).json(
     new ApiResponse(
       200,
-      { result }, // only send conversationId
+      { result },
       "Message created successfully"
     )
   );

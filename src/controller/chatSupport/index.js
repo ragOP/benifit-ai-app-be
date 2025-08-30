@@ -37,7 +37,7 @@ exports.handleMessages = asyncHandler(async (req, res) => {
   });
   return res
     .status(200)
-    .json(new ApiResponse(200, populatedMessage, "message created success"));
+    .json(new ApiResponse(200, result, "message created success"));
 });
 
 exports.handleGetChatHistory = asyncHandler(async (req, res) => {

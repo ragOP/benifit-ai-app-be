@@ -25,6 +25,8 @@ exports.handleLogin = asyncHandler(async (req, res) => {
     throw new ApiResponse(400, "", "loginId or password is invalid");
   }
   const result = await loginUser(loginId, password, fcmToken);
+  console.log(result, "kndsbvkjdfs");
+
   const { statusCode, data, message } = result;
 
   return res

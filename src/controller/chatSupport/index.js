@@ -45,13 +45,9 @@ exports.handleMessages = asyncHandler(async (req, res) => {
     role,
   });
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      { result },
-      "Message created successfully"
-    )
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { result }, "Message created successfully"));
 });
 
 exports.handleGetChatHistory = asyncHandler(async (req, res) => {

@@ -70,6 +70,7 @@ exports.loginUser = async (loginId, password, fcmToken) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
   let data = await User.findById(user._id).select("-password");
+  console.log(data, "datandvsbdf");
 
   data = { ...data._doc, token };
   return {

@@ -127,10 +127,7 @@ exports.getClaimedOffer = async (userId) => {
       message: "user not found",
     };
   }
-  const data = await Response.findOne(
-    { user: userId },
-    { claimedOffer: 1, unClaimedOffer: 1, _id: 0 }
-  );
+  const data = await Response.findOne({ user: userId });
   if (!data) {
     return {
       status: 404,

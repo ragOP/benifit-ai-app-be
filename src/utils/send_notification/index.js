@@ -3,6 +3,7 @@ const User = require("../../models/user");
 
 exports.sendPushNotification = async (
   fcmToken,
+  apnToken,
   userId,
   notificationData,
   data = {}
@@ -10,7 +11,7 @@ exports.sendPushNotification = async (
   try {
     const messaging = getMessaging();
     const message = {
-      token: fcmToken,
+      token: fcmToken ? fcmToken : apnToken,
       notification: {
         title: notificationData.title || "New Notification",
         body: notificationData.body || "You have a new notification",

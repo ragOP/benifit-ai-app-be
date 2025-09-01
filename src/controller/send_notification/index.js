@@ -18,6 +18,7 @@ exports.sendNotificationtoAllUsers = asyncHandler(async (req, res) => {
     }
     const response = await sendPushNotification(
       user.fcmToken,
+      user.apnToken,
       user._id,
       notificationData
     );

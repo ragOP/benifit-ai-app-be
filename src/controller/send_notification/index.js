@@ -12,10 +12,10 @@ exports.sendNotificationtoAllUsers = asyncHandler(async (req, res) => {
   let failureCount = 0;
 
   for (const user of users) {
-    if (!user.fcmToken) {
-      failureCount++;
-      continue;
-    }
+    // if (!user.fcmToken) {
+    //   failureCount++;
+    //   continue;
+    // }
     const response = await sendPushNotification(
       user.fcmToken,
       user.apnToken,

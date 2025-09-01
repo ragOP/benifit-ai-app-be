@@ -1,5 +1,6 @@
 const Offer = require("../../models/offers/index.js");
 const Response = require("../../models/Response/index.js");
+const User = require("../../models/user/index.js");
 
 exports.storeEligibleOffers = async (userId) => {
   const response = await Response.findOne({ userId });
@@ -118,15 +119,20 @@ exports.storeUnclaimedOffer = async (userId) => {
   return updatedResponse;
 };
 exports.getClaimedOffer = async (userId) => {
-  const data = await Response.findOne(
-    { userId },
-    { claimedOffer: 1, unClaimedOffer: 1, _id: 0 }
-  );
-  if (!data) {
+  const user = await User.findById(userId);
+  if (!user) {
     return {
       status: 404,
       data: null,
       message: "user not found",
+    };
+  }
+  const data = await Response.findOne({ user: userId });
+  if (!data) {
+    return {
+      status: 404,
+      data: null,
+      message: "Offer not found",
     };
   }
   return {

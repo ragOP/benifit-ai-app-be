@@ -13,6 +13,16 @@ const userSchema = new Schema({
   fcmToken: {
     type: String,
   },
+  role: {
+    type: String,
+    enum: ["User", "Admin"],
+    default: "User",
+  },
+  conversationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Conversation",
+    default: null,
+  },
 });
 
 const User = mongoose.model("User", userSchema);

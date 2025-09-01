@@ -31,6 +31,7 @@ exports.handleResponse = asyncHandler(async (req, res) => {
     origin,
     sendMessageOn,
     number,
+    user
   } = req.body;
   const tagsArray = (tags || []).map((t) => TAGS[t]).filter(Boolean);
   const response = await Response.create({
@@ -41,8 +42,10 @@ exports.handleResponse = asyncHandler(async (req, res) => {
     zipCode,
     tags: tagsArray,
     origin,
+    unClaimedOffer: tagsArray,
     sendMessageOn,
     number,
+    user
   });
   if (!response) {
     throw new ApiError(404, "Response Creation Failed");
@@ -152,4 +155,14 @@ exports.handleGetAllUsers = asyncHandler(async (req, res) => {
       "All users found"
     )
   );
+});
+
+exports.handleGetRefrel = asyncHandler(async (req, res) => {
+  const appLink = {
+    androidLink: "kdfhshjdfs",
+    ios: "mdklngskl",
+  };
+  return res
+    .status(200)
+    .json(new ApiResponse(200, appLink, "refrel Success full"));
 });

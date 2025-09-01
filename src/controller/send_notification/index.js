@@ -1,4 +1,5 @@
 const User = require("../../models/user");
+const { sendViaAPNs } = require("../../utils/send_via_apn");
 const { ApiResponse } = require("../../utils/apiResponse");
 const { asyncHandler } = require("../../utils/asynchandler");
 const { sendPushNotification } = require("../../utils/send_notification");
@@ -54,4 +55,56 @@ exports.sendNotificationtoAllUsers = asyncHandler(async (req, res) => {
         overallSuccess
       )
     );
+});
+
+exports.sendNotificationToIosUser = asyncHandler(async (req, res) => {
+  const { notificationData = {}, userIds = [], topicOverride } = req.body;
+  let targets = [];
+  if (!userIds || userIds.length === 0) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "No user IDs provided", false));
+  }
+  const users = await User.find({ _id: { $in: userIds } }, { apnToken: 1 });
+  const userWithApnTokens = users
+    .map((u) => ({ userId: u._id, token: u.apnToken }))
+    .filter((t) => !!t.token);
+  targets = targets.concat(userWithApnTokens);
+
+  if (!targets.length) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          null,
+          "No valid APN tokens found for the provided user IDs",
+          false
+        )
+      );
+  }
+
+  const results = [];
+  let successCount = 0,
+    failureCount = 0;
+
+  for (const t of targets) {
+    const resp = await sendViaAPNs({
+      apnToken: t.token,
+      notificationData,
+      userId: t.userId,
+      topicOverride,
+    });
+    results.push({ userId: t.userId, ...resp });
+    resp.success ? successCount++ : failureCount++;
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, {
+      totalUsers: targets.length,
+      successCount,
+      failureCount,
+      results,
+    })
+  );
 });

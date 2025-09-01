@@ -7,11 +7,11 @@ const {
 } = require("../../services/auth/user/index.js");
 
 exports.handleRegister = asyncHandler(async (req, res) => {
-  const { username, password, email, fcmToken, role = "User" } = req.body;
+  const { username, password, email, fcmToken = "", apnToken = "", role = "User" } = req.body;
   if (!username || !password) {
     throw new ApiResponse(400, "", "username or password is invalid");
   }
-  const result = await registerUser(username, password, email, fcmToken, role);
+  const result = await registerUser(username, password, email, fcmToken, apnToken, role);
   const { statusCode, data, message } = result;
 
   return res
@@ -20,11 +20,11 @@ exports.handleRegister = asyncHandler(async (req, res) => {
 });
 
 exports.handleLogin = asyncHandler(async (req, res) => {
-  const { loginId, email, password, fcmToken } = req.body;
+  const { loginId, email, password, fcmToken = "", apnToken = "" } = req.body;
   if (!loginId || !password) {
     throw new ApiResponse(400, "", "loginId or password is invalid");
   }
-  const result = await loginUser(loginId, password, fcmToken);
+  const result = await loginUser(loginId, password, fcmToken, apnToken);
   console.log(result, "kndsbvkjdfs");
 
   const { statusCode, data, message } = result;

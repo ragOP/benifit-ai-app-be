@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const admin = require("../../../firebase/index.js");
 
-exports.registerUser = async (username, password, email, fcmToken, role) => {
+exports.registerUser = async (username, password, email, fcmToken, apnToken, role) => {
   const checkExistingUser = await existingUser(username, email);
   if (checkExistingUser) {
     return {
@@ -23,6 +23,7 @@ exports.registerUser = async (username, password, email, fcmToken, role) => {
     hashedPassword,
     email,
     fcmToken,
+    apnToken,
     role
   );
   if (!newUser) {
@@ -45,7 +46,7 @@ exports.registerUser = async (username, password, email, fcmToken, role) => {
   };
 };
 
-exports.loginUser = async (loginId, password, fcmToken) => {
+exports.loginUser = async (loginId, password, fcmToken, apnToken) => {
   const user = await User.findOne({
     $or: [{ username: loginId }, { email: loginId }],
   });
@@ -57,6 +58,7 @@ exports.loginUser = async (loginId, password, fcmToken) => {
     };
   }
   fcmToken = fcmToken || user.fcmToken;
+  apnToken = apnToken || user.apnToken;
   user.fcmToken = fcmToken;
   await user.save();
   const isMatch = await bcrypt.compare(password, user.password);

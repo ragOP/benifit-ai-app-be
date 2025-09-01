@@ -15,6 +15,7 @@ exports.createUser = async (
   hashedPassword,
   email,
   fcmToken,
+  apnToken,
   role
 ) => {
   const user = await User.create({
@@ -22,6 +23,7 @@ exports.createUser = async (
     password: hashedPassword,
     email,
     fcmToken,
+    apnToken,
     role,
   });
   return user;

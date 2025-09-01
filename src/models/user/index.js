@@ -13,6 +13,9 @@ const userSchema = new Schema({
   fcmToken: {
     type: String,
   },
+  apnToken: {
+    type: String,
+  },
   role: {
     type: String,
     enum: ["User", "Admin"],

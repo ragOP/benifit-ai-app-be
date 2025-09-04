@@ -7,7 +7,9 @@ const {
   handleClaimedOffers,
   handleGetAllUsers,
   handleGetRefrel,
+  handleDeleteUser,
 } = require("../../controller/user");
+const verifyJwt = require("../../middleware/user");
 
 const router = express.Router();
 
@@ -18,5 +20,6 @@ router.route("/abandoned-claim").post(handleAbandonedClaim);
 router.route("/get-all-user").get(handleGetAllUsers);
 router.route("/claimed-offer").get(handleClaimedOffers);
 router.route("/get-refrrel").get(handleGetRefrel);
+router.route("/delete-user").delete(verifyJwt, handleDeleteUser);
 
 module.exports = router;

@@ -10,6 +10,7 @@ const {
   storeUnclaimedOffer,
   getClaimedOffer,
 } = require("../../services/offer/index.js");
+const { deleteUser } = require("../../services/auth/user/index.js");
 const User = require("../../models/user/index.js");
 
 const TAGS = {
@@ -31,7 +32,7 @@ exports.handleResponse = asyncHandler(async (req, res) => {
     origin,
     sendMessageOn,
     number,
-    user
+    user,
   } = req.body;
   const tagsArray = (tags || []).map((t) => TAGS[t]).filter(Boolean);
   const response = await Response.create({
@@ -45,7 +46,7 @@ exports.handleResponse = asyncHandler(async (req, res) => {
     unClaimedOffer: tagsArray,
     sendMessageOn,
     number,
-    user
+    user,
   });
   if (!response) {
     throw new ApiError(404, "Response Creation Failed");
@@ -165,4 +166,14 @@ exports.handleGetRefrel = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, appLink, "refrel Success full"));
+});
+
+exports.handleDeleteUser = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const result = await deleteUser(userId);
+  const { statusCode, data, message } = result;
+
+  return res
+    .status(statusCode)
+    .json(new ApiResponse(statusCode, data, message));
 });

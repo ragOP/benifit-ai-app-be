@@ -7,7 +7,14 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const admin = require("../../../firebase/index.js");
 
-exports.registerUser = async (username, password, email, fcmToken, apnToken, role) => {
+exports.registerUser = async (
+  username,
+  password,
+  email,
+  fcmToken,
+  apnToken,
+  role
+) => {
   const checkExistingUser = await existingUser(username, email);
   if (checkExistingUser) {
     return {
@@ -98,5 +105,21 @@ exports.loginWithGoogle = async (idToken, fcmToken) => {
     statusCode: 200,
     message: "login successful",
     data: data,
+  };
+};
+exports.deleteUser = async (userId) => {
+  console.log(userId);
+  const user = await User.findByIdAndDelete(userId);
+  if (!user) {
+    return {
+      statusCode: 404,
+      message: "user not found",
+      data: null,
+    };
+  }
+  return {
+    statusCode: 200,
+    data: user,
+    message: "User deleted successfully",
   };
 };
